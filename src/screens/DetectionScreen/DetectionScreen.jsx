@@ -22,6 +22,7 @@ import { decode, encode } from 'base-64';
 import AnimatedLoader from "react-native-animated-loader";
 // import LoaderKit from 'react-native-loader-kit'
 import LoaderKit from 'react-native-loader-kit'
+import LoaderScreen from '../../components/LoaderScreen';
 import axios from 'axios';
 if (!global.btoa) {
   global.btoa = encode;
@@ -157,7 +158,7 @@ const DetectionScreen = ({ navigation }) => {
   const sendImageToServer = async (base64Image) => {
     try {
       // setLoader(true);
-      const response = await axios.post('http://192.168.39.27:5002/preProcess', {
+      const response = await axios.post('http://192.168.100.27:5002/preProcess', {
         base64Image: base64Image,
       }, {
         headers: {

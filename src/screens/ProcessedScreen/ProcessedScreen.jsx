@@ -3,46 +3,102 @@ import { View, Text, Image, StyleSheet, TouchableOpacity ,Alert } from 'react-na
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import colors from '../../utils/colors';
 import BottomTab from '../../routes/BottomTab';
+import RouteName from '../../routes/RouteName';
 import axios from 'axios';
 import BottomTabProcessed from '../../routes/BottomTabProcessed';
 const ProcessedScreen = ({ route, navigation }) => {
     const { imgURL } = route.params;
     // console.log("URL in ProcessedScreen:", imgURL);
 
-   const sendImageToServer = async () => {
-    try {
-      
-      const response = await axios.post('http://192.168.39.27:5002/predict', {
-        base64Image: imgURL,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        
-      });
+  //   const sendImageToServer = async () => {
+  //     try {
+  //         const response = await axios.post('http://192.168.100.27:5002/predict', {
+  //             base64Image: imgURL,
+  //         }, {
+  //             headers: {
+  //                 'Content-Type': 'application/json',
+  //             },
+  //         });
   
-      console.log('Image sent to server from processed');
-      const result  = response.data;
-      // const imageUri = `data:image/png;base64,${result}`;
-      console.log('Image URI:', result);
-    
-    Alert.alert('Result', `Denomination: ${result.denomination}, Fake/Real: ${result.fake_or_real}`);
+  //         console.log('Image sent to server successfully');
+  //         const result = response.data;
+  //         Alert.alert('Result', `Denomination: ${result.denomination}, Fake/Real: ${result.fake_or_real}`);
+  //         // if (result.error) {
+  //         //     Alert.alert('Error', result.error);
+  //         // } else if (result.denomination) {
+  //         //     Alert.alert('Result', `Denomination: ${result.denomination}, Fake/Real: ${result.fake_or_real}`);
+  //         // } 
+  //         // else if(result.denomination == 0){
+  //         //   Alert.alert('Retry', 'not the currency image');
+  //         // }
+  //         // else {
+  //         //     Alert.alert('Unknown Response', 'Unexpected response from server');
+  //         // }
+  
+  //         return result;
+  //     } catch (error) {
+  //         console.log('Error sending image to server:', error.message);
+  //         Alert.alert('Error', 'Failed to send image to server');
+  //         return null;
+  //     } finally {
+  //         console.log("Finally Called!");
+  //     }
+  // };
+  
+  
 
-   
-    // navigation.navigate(RouteName.RESULT_SCREEN, { 
-    //     denomination: result.denomination,
-    //   fakeOrReal: result.fake_or_real,
-    //   imgURL: base64Image
-    //    })   
-      return result;
+  const sendImageToServer = async () => {
+    try {
+        const response = await axios.post('http://192.168.100.27:5002/predict', {
+            base64Image: imgURL,
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        console.log('Image sent to server successfully');
+        const result = response.data;
+
+        if (result.error) {
+            Alert.alert('Retry...', result.error, [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.navigate(RouteName.DETECTION_SCREEN)
+                }
+            ]);
+        } else if (result.denomination && result.fake_or_real) {
+            Alert.alert('Result', `Denomination: ${result.denomination}, Fake/Real: ${result.fake_or_real}`, [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.navigate(RouteName.DETECTION_SCREEN)
+                }
+            ]);
+        } else {
+            Alert.alert('Unknown Response', 'Unexpected response from server', [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.navigate(RouteName.DETECTION_SCREEN)
+                }
+            ]);
+        }
+        
+        return result;
     } catch (error) {
-      console.log('Error sending image to server:', error.message);             
-      return null;
+        console.log('Error sending image to server:', error.message);
+        Alert.alert('Error', 'Failed to send image to server', [
+            {
+                text: 'OK',
+                onPress: () => navigation.navigate(RouteName.DETECTION_SCREEN)
+            }
+        ]);
+        return null;
     } finally {
-      console.log("Finally Called!");
+        console.log("Finally Called!");
     }
-  };
-  
+};
+
+
 
     return (
         <>
